@@ -3,8 +3,8 @@ message: "If you use this software, please cite it as below."
 title: "LAMMPS + OVITO workflow for metallic glass preparation and nano-indentation"
 type: software
 authors:
-  - family-names: "Devi"
-    given-names: "Khushubo"
+  - family-names: "Bajpai"
+    given-names: "Anurag"
 keywords:
   - molecular dynamics
   - metallic glass
@@ -12,9 +12,3 @@ keywords:
   - LAMMPS
   - OVITO
 license: MIT
-repository-code: "REPLACE_WITH_GITHUB_URL"
-url: "REPLACE_WITH_PROJECT_URL"
-abstract: >
-  LAMMPS input scripts and OVITO-based post-processing utilities for preparing a Cu–Zr
-  metallic glass, running nano-indentation, and extracting local deformation metrics
-  (D2min/STZ tagging) and Voronoi/free-volume statistics.
