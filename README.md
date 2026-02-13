@@ -1,4 +1,4 @@
-# MD workflow for Cu–Zr-(al-Ag-Ti) metallic glass: glass preparation, depth-hold nano-indentation, and OVITO-based post-processing
+# MD workflow for Cu–Zr-(Al-Ag-Ti) metallic glass: glass preparation, depth-hold nano-indentation, and OVITO-based post-processing
 
 This repository contains LAMMPS input scripts and post-processing utilities used to (i) generate an amorphous Cu–Zr-(Al/Ag/Ti) metallic glass, (ii) perform constant-depth hold nano-indentation, and (iii) compute structural/kinetic descriptors such as Voronoi-based free volume and non-affine displacement (D2min) using OVITO’s Python API.
 
