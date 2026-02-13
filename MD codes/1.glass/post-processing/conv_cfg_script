@@ -1,0 +1,6 @@
+clear
+read_restart ../restart.glass
+
+variable        elems string "Zr Cu"
+write_dump all cfg final.cfg mass type xs ys zs modify element ${elems} sort id pad 5
+

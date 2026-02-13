@@ -1,0 +1,12 @@
+{
+  "N": 62500,
+  "mean_free_volume": 4.639830330779357,
+  "std_free_volume": 1.1442847059735608,
+  "min_free_volume": 1.3488839280951144,
+  "max_free_volume": 9.773494509858185,
+  "hist_bins": 150,
+  "hist_min": 2.2493053269074155,
+  "hist_max": 7.647120403650266,
+  "use_radii": true,
+  "clip_negative": false
+}

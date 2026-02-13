@@ -1,0 +1,180 @@
+# ===== Auto-generated for 1.Cu50Zr50 =====
+units            metal
+boundary         p p p
+atom_style       atomic
+atom_modify      sort 0 0
+neighbor         0.3 bin
+timestep         0.001
+
+lattice fcc 3.7
+region  mybox block 0 25 0 25 0 25
+create_box 2 mybox
+create_atoms 1 box
+
+# 조성: Zr50 Cu50
+mass 1 91.224000  # Zr
+mass 2 63.546000  # Cu
+
+# MEAM
+pair_style meam
+pair_coeff * * ../library.meam Zr Cu ../ZrCu.meam Zr Cu
+
+# 타입 분할 (총 62500개 기준)
+set type 1 type/subset 2 31250 88099
+
+# 초기 속도/모멘텀
+velocity all create 300 4928459 mom yes rot yes dist gaussian
+
+# 공통 변수/thermo
+variable Tdamp    equal 0.1
+variable Pdamp    equal 1.0
+variable Ptarget  equal 0.0
+thermo 1000
+thermo_style custom step temp press etotal density pe enthalpy vol
+
+# 샘플 변수 (1 ps 간격)
+variable vT   equal temp
+variable rho  equal density
+variable ent  equal enthalpy/atoms
+
+# 1) 가열 300 -> 2500 K @ 10^13 K/s (220 ps = 220000 steps)
+fix OUT1 all ave/time 1000 1 1000 v_vT v_rho v_ent file tg_heating.dat
+fix NPT all npt temp 300 2500 ${Tdamp} iso ${Ptarget} ${Ptarget} ${Pdamp}
+run 220000
+unfix NPT
+unfix OUT1
+
+# 2) 냉각 2500 -> 300 K @ 10^12 K/s, 10 K 세그먼트당 10 ps, 재평형 0.0 ps
+fix OUT2 all ave/time 1000 1 1000 v_vT v_rho v_ent file tg_cooling.dat
+
+variable dTseg      equal 10
+variable seg_steps  equal 10000
+variable eq_steps   equal 0
+variable nseg       equal floor((2500-300)/${dTseg})
+
+variable i loop ${nseg}
+label loop_cool
+  variable Tstart equal 2500 - (${i}-1)*${dTseg}
+  variable Tstop  equal 2500 - (${i})*${dTseg}
+
+  fix NPT all npt temp ${Tstart} ${Tstop} ${Tdamp} iso ${Ptarget} ${Ptarget} ${Pdamp}
+  run ${seg_steps}
+  unfix NPT
+
+  if "${eq_steps} > 0" then &
+  "fix NPT all npt temp ${Tstop} ${Tstop} ${Tdamp} iso ${Ptarget} ${Ptarget} ${Pdamp}; run ${eq_steps}; unfix NPT"
+
+  next i
+jump lammps_script loop_cool
+unfix OUT2
+
+write_restart restart.glass
+
+clear
+
+units            metal
+boundary         p p p
+atom_style       atomic
+atom_modify      sort 0 0
+neighbor         0.3 bin
+timestep         0.001
+
+read_restart restart.glass
+reset_timestep 0
+
+# 조성: Zr50 Cu50
+mass 1 91.224000  # Zr
+mass 2 63.546000  # Cu
+
+# MEAM
+pair_style meam
+pair_coeff * * ../library.meam Zr Cu ../ZrCu.meam Zr Cu
+
+# 공통 변수/thermo
+variable Tdamp    equal 0.1
+variable Pdamp    equal 1.0
+variable Ptarget  equal 0.0
+thermo 1000
+thermo_style custom step temp press etotal density pe enthalpy vol
+
+# 샘플 변수 (1 ps 간격)
+variable vT   equal temp
+variable rho  equal density
+variable ent  equal enthalpy/atoms
+
+variable Ttgt equal 500
+variable Tcur equal 300
+
+variable ramp_steps equal (${Ttgt} - ${Tcur})*100
+variable hold_steps equal floor(2000.0/0.001 + 0.5)
+variable ofile string anneal_${Ttgt}.dat
+
+fix OUT all ave/time 1000 1 1000 v_vT v_rho v_ent file ${ofile}
+fix NPT all npt temp ${Tcur} ${Ttgt} ${Tdamp} iso ${Ptarget} ${Ptarget} ${Pdamp}
+run ${ramp_steps}
+unfix NPT
+
+fix NPT all npt temp ${Ttgt} ${Ttgt} ${Tdamp} iso ${Ptarget} ${Ptarget} ${Pdamp}
+run ${hold_steps}
+unfix NPT
+
+fix NPT all npt temp ${Ttgt} ${Tcur} ${Tdamp} iso ${Ptarget} ${Ptarget} ${Pdamp}
+run ${ramp_steps}
+unfix NPT
+unfix OUT
+write_restart restart.anneal_500K
+
+clear
+
+units            metal
+boundary         p p p
+atom_style       atomic
+atom_modify      sort 0 0
+neighbor         0.3 bin
+timestep         0.001
+
+read_restart restart.glass
+reset_timestep 0
+
+# 조성: Zr50 Cu50
+mass 1 91.224000  # Zr
+mass 2 63.546000  # Cu
+
+# MEAM
+pair_style meam
+pair_coeff * * ../library.meam Zr Cu ../ZrCu.meam Zr Cu
+
+# 공통 변수/thermo
+variable Tdamp    equal 0.1
+variable Pdamp    equal 1.0
+variable Ptarget  equal 0.0
+thermo 1000
+thermo_style custom step temp press etotal density pe enthalpy vol
+
+# 샘플 변수 (1 ps 간격)
+variable vT   equal temp
+variable rho  equal density
+variable ent  equal enthalpy/atoms
+
+variable Ttgt equal 700
+variable Tcur equal 300
+
+variable ramp_steps equal (${Ttgt} - ${Tcur})*100
+variable hold_steps equal floor(2000.0/0.001 + 0.5)
+variable ofile string anneal_${Ttgt}.dat
+
+fix OUT all ave/time 1000 1 1000 v_vT v_rho v_ent file ${ofile}
+fix NPT all npt temp ${Tcur} ${Ttgt} ${Tdamp} iso ${Ptarget} ${Ptarget} ${Pdamp}
+run ${ramp_steps}
+unfix NPT
+
+fix NPT all npt temp ${Ttgt} ${Ttgt} ${Tdamp} iso ${Ptarget} ${Ptarget} ${Pdamp}
+run ${hold_steps}
+unfix NPT
+
+fix NPT all npt temp ${Ttgt} ${Tcur} ${Tdamp} iso ${Ptarget} ${Ptarget} ${Pdamp}
+run ${ramp_steps}
+unfix NPT
+unfix OUT
+write_restart restart.anneal_700K
+

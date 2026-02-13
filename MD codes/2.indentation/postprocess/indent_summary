@@ -1,0 +1,8 @@
+Pmax = 803.9638 eV/Å @ hmax = 21.9750 Å
+S0   = 377.362153 eV/Å²  (fit points: 124)
+hc   = 20.3771 Å,  A = 2536.5235 Å²
+H    = 50.782 GPa
+Er   = 1063.884 GPa
+Es   = 948.027 GPa  (rigid indenter)
+'hold' segment present: no
+Saved: indent_summary.csv, indent_curve.csv, indent_load_depth.png, unloading_fit.png

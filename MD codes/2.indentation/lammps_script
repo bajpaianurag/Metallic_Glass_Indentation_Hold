@@ -1,0 +1,104 @@
+# ---------- System & Potential ----------
+units           metal 
+atom_style      atomic
+boundary        p p p 
+read_restart    restart.glass
+reset_timestep  0
+
+mass 1 91.224  # Zr
+mass 2 63.546  # Cu
+variable        elems string "Zr Cu"
+
+pair_style       meam
+pair_coeff       * * ../../../../library.meam ${elems} ../../../../ZrCu.meam ${elems}
+
+velocity all set 0.0 0.0 0.0
+run 0
+
+# ---------- Variables ----------
+variable R      equal 40.0                      # Å
+variable dmax   equal 22.000000                  # Å 
+variable vel    equal 0.500000                   # Å/ps
+variable x0     equal (xhi-xlo)/2+xlo
+variable y0     equal (yhi-ylo)/2+ylo
+
+variable new_zhi equal zhi+v_R*2+10.0
+change_box all z final $(zlo) ${new_zhi} units box
+
+variable z0     equal "zhi-(v_R+10.0)"
+variable zmove  equal "v_z0 - v_vel*step*dt"
+variable nstep  equal "round(v_dmax/v_vel/dt)"
+variable zup    equal "v_z0 - v_vel*v_nstep*dt + v_vel*(step - v_nstep)*dt"
+
+# ---------- Regions & Groups ----------
+variable bot_low  equal zlo
+variable bot_high equal zlo+10.0
+
+region bottom block INF INF INF INF ${bot_low} ${bot_high} units box
+group  bottom_atoms region bottom
+group  mobile subtract all bottom_atoms
+
+# ---------- Time Integration & Thermostat ----------
+fix nve_shell all nve
+fix freeze bottom_atoms setforce 0.0 0.0 0.0
+velocity bottom_atoms set 0.0 0.0 0.0
+fix temp_scale mobile temp/rescale 100 0.1 0.1 0.01 1.0
+
+# ---------- Computes (for output) ----------
+compute pe_atom all pe/atom
+compute ke_atom all ke/atom
+
+compute Zmax mobile reduce max z
+
+# ---------- Outputs (optional dumps) ----------
+shell           "rm -rf CFG"
+shell           mkdir CFG
+dump            d1 all cfg 100 CFG/indent_*.cfg mass type xs ys zs
+dump_modify     d1 element ${elems} sort id pad 5
+
+# pre snapshot
+run 0
+write_dump all custom dump.pre id type x y z c_pe_atom c_ke_atom
+
+# ---------- Loading Phase ----------
+fix indent_load all indent 1000 sphere ${x0} ${y0} v_zmove ${R} units box
+
+thermo 1000
+thermo_style custom step time temp pe ke etotal press lx ly lz v_z0 v_zmove v_nstep
+
+variable LoadL  equal f_indent_load[3]
+variable DepthL  equal "v_z0 - v_zmove"
+variable ZmaxM   equal "c_Zmax"
+variable Lbox    equal "lz"
+variable EindL   equal "f_indent_load"     # indent energy during loading
+
+compute t_all all temp
+
+fix log_load all ave/time 10 1 10 v_LoadL v_DepthL v_ZmaxM v_Lbox v_EindL c_t_all f_indent_load[1] f_indent_load[2] f_indent_load[3] file indentation_out.load mode scalar
+
+run $(v_nstep)
+
+unfix indent_load
+unfix log_load
+
+# ---------- Unloading Phase ----------
+fix indent_unload all indent 1000 sphere ${x0} ${y0} v_zup ${R} units box
+
+thermo 1000
+thermo_style custom step time temp pe ke etotal press lx ly lz v_zup
+
+variable LoadU  equal f_indent_unload[3]
+variable DepthU  equal "v_z0 - v_zup"
+variable EindU   equal "f_indent_unload"
+
+fix log_unload all ave/time 10 1 10 v_LoadU v_DepthU v_ZmaxM v_Lbox v_EindU c_t_all f_indent_unload[1] f_indent_unload[2] f_indent_unload[3] file indentation_out.unload mode scalar
+
+run $(v_nstep)
+
+unfix indent_unload
+unfix log_unload
+
+# ---------- Final Snapshots ----------
+write_dump all custom dump.post id type x y z c_pe_atom c_ke_atom
+
+write_dump all cfg final.cfg mass type xs ys zs modify element ${elems} sort id pad 5

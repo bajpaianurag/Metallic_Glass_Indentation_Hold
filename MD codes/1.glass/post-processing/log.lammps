@@ -1,0 +1,19 @@
+LAMMPS (22 Jul 2025)
+clear
+read_restart ../restart.glass
+Reading restart file ...
+  restart file = 22 Jul 2025, LAMMPS = 22 Jul 2025
+WARNING: Restart file used different # of processors: 36 vs. 1 (../read_restart.cpp:629)
+  restoring atom style atomic from restart
+  orthogonal box = (-5.3745847 -5.3745847 -5.3745847) to (97.874585 97.874585 97.874585)
+  1 by 1 by 1 MPI processor grid
+  pair style meam stores no restart info
+  62500 atoms
+  read_restart CPU = 0.098 seconds
+
+variable        elems string "Zr Cu"
+write_dump all cfg final.cfg mass type xs ys zs modify element ${elems} sort id pad 5
+write_dump all cfg final.cfg mass type xs ys zs modify element Zr Cu sort id pad 5
+WARNING: Calling write_dump before a full system init (../write_dump.cpp:89)
+
+Total wall time: 0:00:00
