@@ -1,6 +1,6 @@
-# MD workflow for Cu–Zr metallic glass: glass preparation, nano-indentation, and OVITO-based post-processing
+# MD workflow for Cu–Zr metallic glass: glass preparation, depth-hold nano-indentation, and OVITO-based post-processing
 
-This repository contains LAMMPS input scripts and post-processing utilities used to (i) generate an amorphous Cu–Zr metallic glass, (ii) perform nano-indentation, and (iii) compute structural/kinetic descriptors such as Voronoi-based free volume and non-affine displacement (D2min^2) using OVITO’s Python API.
+This repository contains LAMMPS input scripts and post-processing utilities used to (i) generate an amorphous Cu–Zr-(Al/Ag/Ti) metallic glass, (ii) perform constant-depth hold nano-indentation, and (iii) compute structural/kinetic descriptors such as Voronoi-based free volume and non-affine displacement (D2min) using OVITO’s Python API.
 
 ## Repository layout
 
@@ -16,7 +16,7 @@ This repository contains LAMMPS input scripts and post-processing utilities used
   - `ZrCu.meam`, `library.meam` — MEAM potential files used by the LAMMPS inputs
   - `move.sh`, `wait.sh` — helper shell scripts
 
-- `matlab/` — MATLAB plotting/analysis scripts (D2min^2, free volume, and force metrics)
+- `matlab/` — MATLAB plotting/analysis scripts (D2min, free volume, and force metrics)
 
 ## Requirements
 
@@ -80,7 +80,7 @@ The indentation input is written for LAMMPS `fix indent`-style workflows and gen
 
 ### 3) Post-processing
 
-#### 3A) D2min^2 + STZ tagging (OVITO)
+#### 3A) D2min (OVITO)
 
 From the indentation post-processing directory:
 
@@ -96,9 +96,9 @@ python d2min.py \
 
 Key outputs:
 
-- `d2min.csv` — per-atom D2min^2 with `STZ` flag
+- `d2min.csv` — per-atom D2min with `STZ` flag
 - `d2min_hist.csv` — histogram (optionally log-binned)
-- `stz_ids.txt` — atom IDs tagged as STZ (D2min^2 ≥ threshold)
+- `stz_ids.txt` — atom IDs tagged as STZ (D2min ≥ threshold)
 - `stz_only.xyz` — STZ-only snapshot (can be visualized in OVITO)
 
 #### 3B) Load–depth, hardness, and modulus (Oliver–Pharr style)
