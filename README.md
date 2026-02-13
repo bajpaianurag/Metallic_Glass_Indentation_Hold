@@ -33,7 +33,6 @@ The post-processing scripts in `post-processing/` and `postprocess/` rely on:
 - `numpy`
 - `pandas` (indentation curve analysis)
 - `matplotlib` (plots)
-- `ase` *(optional)*: only needed if you want STZ-only export to AtomEye CFG from `d2min.py`.
 
 Install via pip:
 
