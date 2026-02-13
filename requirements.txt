@@ -1,0 +1,10 @@
+# Core scientific stack
+numpy>=1.23
+pandas>=1.5
+matplotlib>=3.6
+
+# OVITO Python API (required by post-processing scripts)
+ovito>=3.10
+
+# Optional (only needed for exporting AtomEye CFG in d2min.py)
+ase>=3.22

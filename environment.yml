@@ -1,0 +1,10 @@
+name: md-ovito
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.10
+  - numpy
+  - pandas
+  - matplotlib
+  - ovito
+  - ase  # optional; remove if not needed
