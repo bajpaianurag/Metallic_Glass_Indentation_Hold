@@ -5,6 +5,9 @@ boundary        p p p
 read_restart    restart.glass
 reset_timestep  0
 
+# Lateral size sensitivity check
+replicate       2 2 1
+
 mass 1 91.224  # Zr
 mass 2 63.546  # Cu
 variable        elems string "Zr Cu"
@@ -17,7 +20,7 @@ run 0
 
 # ---------- Variables ----------
 variable R      equal 40.0                      # Å
-variable dmax   equal 22.000000                  # Å 
+variable dmax   equal 20.000000                  # Å 
 variable vel    equal 0.500000                   # Å/ps
 variable x0     equal (xhi-xlo)/2+xlo
 variable y0     equal (yhi-ylo)/2+ylo
